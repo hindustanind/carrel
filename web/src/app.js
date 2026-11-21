@@ -415,22 +415,24 @@ function updateWheel() {
     o.style.opacity = op.toFixed(3);
   }
 }
+let durScrollT = 0, lastMicroTick = -1, durLockUntil = 0;
 function centerDur(mins, smooth = true) {
   const el = durOpts.find(o => +o.dataset.min === mins); if (!el || !durTrack) return;
   const x = el.offsetLeft - (durTrack.clientWidth - el.offsetWidth) / 2;
+  if (smooth && !reduced) durLockUntil = Date.now() + 420;
   durTrack.scrollTo({ left: Math.max(0, x), behavior: smooth && !reduced ? 'smooth' : 'auto' });
   requestAnimationFrame(updateWheel);
 }
-let durScrollT = 0, lastMicroTick = -1;
 durTrack?.addEventListener('scroll', () => {
   updateWheel();
+  if (Date.now() < durLockUntil) return;                                       // ignore mid-glide events after a direct tap
   const mid = durTrack.scrollLeft + durTrack.clientWidth / 2;
-  const micro = Math.round(durTrack.scrollLeft / 12.4);                       // 5 calibrated ruler ticks per 62px stop
+  const micro = Math.round(durTrack.scrollLeft / 12.4);                        // 5 calibrated ruler ticks per 62px stop
   let best = durOpts[0], bestD = Infinity;
   for (const o of durOpts) { const d = Math.abs(o.offsetLeft + o.offsetWidth / 2 - mid); if (d < bestD) { bestD = d; best = o; } }
   const mins = +best.dataset.min;
   if (mins !== state.duration) { state.duration = mins; lastMicroTick = micro; fx.tick(1); syncDurUi(); }
-  else if (micro !== lastMicroTick) { lastMicroTick = micro; fx.tick(.5); }   // crisp micro-click as ruler ticks glide past needle
+  else if (micro !== lastMicroTick) { lastMicroTick = micro; fx.tick(.5); }    // crisp micro-click as ruler ticks glide past needle
 }, { passive: true });
 durTrack?.addEventListener('wheel', e => {
   if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); durTrack.scrollLeft += e.deltaY; }
@@ -531,9 +533,13 @@ function renderMe(rise = false) {
     });
     const at = t => `<b class="num">${clockTime(t)}</b>`;
     const mins = Math.round((b.duration_s || 7200) / 60), sessEnd = b.checked_in_at ? new Date(new Date(b.checked_in_at).getTime() + (b.duration_s || 7200) * 1000) : null;
-    $('#foot').innerHTML = st === 'held' ? `<span>Session <b>${durLabel(mins)}</b></span><span>Hold ends at ${at(b.expires_at)}</span><span>Breaks up to <b>20 min</b></span>`
+    const ps = $('#pSession');
+    if (st === 'held') { ps.hidden = false; ps.innerHTML = `Booked for <b>${durLabel(mins)}</b> · starts when you scan`; }
+    else if (st === 'occupied' && sessEnd) { ps.hidden = false; ps.innerHTML = `<b>${durLabel(mins)}</b> session · ends at ${at(sessEnd)}`; }
+    else { ps.hidden = true; }
+    $('#foot').innerHTML = st === 'held' ? `<span>Hold ends at ${at(b.expires_at)}</span><span>Breaks up to <b>20 min</b> after check-in</span>`
       : st === 'break' ? `<span>Checked in at ${at(b.checked_in_at)}</span><span>Break ends at ${at(b.expires_at)}</span>`
-      : `<span>Checked in at ${at(b.checked_in_at)}</span><span>Session <b>${durLabel(mins)}</b> · until ${at(sessEnd)}</span>`;
+      : `<span>Checked in at ${at(b.checked_in_at)}</span><span>Breaks up to <b>20 min</b></span>`;
     const pass = $('#pass'); if (rise) { pass.classList.remove('rise'); void pass.offsetWidth; pass.classList.add('rise'); }
   }
   tick();
@@ -589,15 +595,21 @@ function tick() {
     return;
   }
   if (!b || state.route !== 'me') return;
-  const arc = $('#arc'), clock = $('#clock');
+  const arc = $('#arc'), clock = $('#clock'), ring = $('#ring');
   if (b.status === 'occupied') {
     const dur = b.duration_s || 7200;
     const left = Math.max(0, (new Date(b.checked_in_at).getTime() + dur * 1000 - now()) / 1000);
-    clock.textContent = left < 3600 ? fmt(left) : `${Math.floor(left / 3600)}:${String(Math.floor(left % 3600 / 60)).padStart(2, '0')}`;
-    arc.style.strokeDashoffset = 628.3 * (1 - Math.max(0, Math.min(1, left / dur))); return;
+    const hrs = Math.floor(left / 3600), m = Math.floor(left % 3600 / 60), sc = Math.floor(left % 60);
+    const txt = hrs > 0 ? `${hrs}:${String(m).padStart(2, '0')}:${String(sc).padStart(2, '0')}` : fmt(left);
+    clock.textContent = txt;
+    ring.classList.toggle('long', txt.length > 5);
+    arc.style.strokeDashoffset = 628.3 * (1 - Math.max(0, Math.min(1, left / dur)));
+    if (left <= 0 && !tick.busy) { tick.busy = true; setTimeout(async () => { await loadMe().catch(() => {}); renderMe(); loadSeats().catch(() => {}); tick.busy = false; }, 1200); }
+    return;
   }
   const left = (new Date(b.expires_at) - now()) / 1000;
   clock.textContent = fmt(left);
+  ring.classList.remove('long');
   arc.style.strokeDashoffset = 628.3 * (1 - Math.max(0, Math.min(1, left / (state.phase?.total || 600))));
   if (left <= 0 && !tick.busy) { tick.busy = true; setTimeout(async () => { await loadMe().catch(() => {}); renderMe(); loadSeats().catch(() => {}); tick.busy = false; }, 1200); }
 }

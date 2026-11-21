@@ -184,8 +184,12 @@ body[data-scene="profile"] .shade { background: rgba(18,15,12,.72); }
 .ring .arc { fill: none; stroke: var(--amber); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 628.3; transition: stroke-dashoffset .9s linear, stroke .4s; }
 .ring.ok .arc { stroke: #EAE1D6; }
 .ring b { display: block; font-size: 56px; font-weight: 600; letter-spacing: -.04em; line-height: 1; }
-.ring span { display: block; font-size: 15px; color: var(--muted); margin-top: 6px; }
-.pass .btn-primary { width: min(380px, 100%); margin-top: 32px; }
+.ring.long b { font-size: 40px; letter-spacing: -.03em; }
+.ring span { display: block; font-size: 14px; color: var(--muted); margin-top: 6px; }
+.pass-session { margin-top: 14px; padding: 6px 14px; border-radius: 999px; font-size: 13.5px; color: var(--ink);
+  background: rgba(255, 236, 214, .08); border: 1px solid rgba(255, 236, 214, .14); }
+.pass-session b { color: var(--amber); font-weight: 600; }
+.pass .btn-primary { width: min(380px, 100%); margin-top: 22px; }
 .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; margin-top: 12px; }
 .links button { height: 40px; font-size: 16px; color: var(--ink); }
 .links button.dim { color: var(--muted); }
@@ -259,8 +263,9 @@ body.st-landing #reserveBtn, body.st-pass #ring { view-transition-name: cta; }
   .dur-picker { margin-top: 12px; }
   .pass .title, .empty .title { font-size: 34px; }
   .pass .meta { font-size: 15px; margin-top: 4px; }
-  .ring { width: 154px; height: 154px; margin-top: 18px; } .ring b { font-size: 40px; } .ring span { font-size: 13px; margin-top: 4px; }
-  .pass .btn-primary { margin-top: 20px; height: 50px; font-size: 16px; }
+  .ring { width: 154px; height: 154px; margin-top: 14px; } .ring b { font-size: 40px; } .ring.long b { font-size: 29px; } .ring span { font-size: 12.5px; margin-top: 4px; }
+  .pass-session { margin-top: 10px; font-size: 12.5px; padding: 5px 12px; }
+  .pass .btn-primary { margin-top: 14px; height: 50px; font-size: 16px; }
   .links { gap: 2px 16px; margin-top: 8px; }
   .links button { height: 34px; font-size: 14.5px; }
   .pass-foot { position: static; margin-top: 10px; gap: 4px 14px; font-size: 12.5px; }

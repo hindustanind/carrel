@@ -69,8 +69,9 @@ test('seed: 3 floors × 129 seats with stable ids', async () => {
 
 test('booking holds a seat; a second student gets SEAT_TAKEN', async () => {
   const a = await user('20000001'), b = await user('20000002');
-  const r1 = await call('POST', '/api/book', a, { seat_id: SEAT });
+  const r1 = await call('POST', '/api/book', a, { seat_id: SEAT, duration_min: 180 });
   assert.equal(r1.status, 201); assert.equal(r1.body.booking.status, 'held');
+  assert.equal(r1.body.booking.duration_s, 10800, 'stores chosen 3 hr session duration');
   assert.ok(new Date(r1.body.booking.expires_at) - Date.now() > 590000, 'hold lasts ~10 minutes');
   const r2 = await call('POST', '/api/book', b, { seat_id: SEAT });
   assert.equal(r2.status, 409); assert.equal(r2.body.error, 'SEAT_TAKEN');

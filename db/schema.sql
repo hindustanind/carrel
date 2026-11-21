@@ -98,20 +98,25 @@ drop trigger if exists bookings_notify on bookings;
 create trigger bookings_notify after insert or update of status, expires_at on bookings
 for each row execute function notify_booking();
 
--- release holds that were never checked in and breaks that ran out. Safe to call any time, from anywhere.
+-- release holds that were never checked in, breaks that ran out, and sessions whose booked duration ended. Safe to call any time, from anywhere.
 create or replace function release_expired(p_seat text default null) returns integer language plpgsql as $$
 declare n integer;
 begin
   with gone as (
     update bookings b
-       set status = 'released', ended_at = now(),
-           end_reason = case b.status when 'held' then 'no_checkin' else 'break_timeout' end
-     where b.status in ('held','break') and b.expires_at < now()
+       set status = case when b.status = 'occupied' then 'completed' else 'released' end,
+           ended_at = now(),
+           end_reason = case b.status when 'held' then 'no_checkin' when 'break' then 'break_timeout' else 'session_ended' end
+     where (
+             (b.status in ('held','break') and b.expires_at < now())
+             or (b.status = 'occupied' and b.checked_in_at is not null
+                 and b.checked_in_at + make_interval(secs => b.duration_s / greatest((select value::double precision from settings where key = 'time_scale'), 1)) < now())
+           )
        and (p_seat is null or b.seat_id = p_seat)
-    returning b.id, b.seat_id, b.user_id, b.end_reason
+    returning b.id, b.seat_id, b.user_id, b.status, b.end_reason
   )
   insert into seat_events(seat_id, user_id, booking_id, kind)
-  select seat_id, user_id, id, 'released_' || end_reason from gone;
+  select seat_id, user_id, id, case when status = 'completed' then 'completed' else 'released_' || end_reason end from gone;
   get diagnostics n = row_count;
   return n;
 end $$;
