@@ -576,11 +576,20 @@ async function act(a, btn = null) {
     await loadMe(); renderMe(true); loadSeats().catch(() => {}); loadFloors().catch(() => {});
   } catch (e) { toast(e.message, 3600); await loadMe().catch(() => {}); }
 }
+function sessionSecondsLeft(booking) {
+  const duration = booking.duration_s || 7200;
+  return Math.max(0, (new Date(booking.checked_in_at).getTime() + duration * 1000 - now()) / 1000);
+}
+function formatSessionTime(seconds) {
+  const hours = Math.floor(seconds / 3600);
+  return hours > 0 ? `${hours}:${fmt(seconds % 3600)}` : fmt(seconds);
+}
 function tick() {
   const b = state.booking;
   if (b && state.route === 'home') {
-    const live = b.status === 'occupied' ? Math.max(0, (now() - new Date(b.checked_in_at)) / 1000) : (new Date(b.expires_at) - now()) / 1000;
-    $('#hClock').textContent = fmt(live); $('#hSub').textContent = { held: 'to check in', occupied: 'in your seat', break: 'left on your break' }[b.status];
+    const occupied = b.status === 'occupied';
+    $('#hClock').textContent = occupied ? formatSessionTime(sessionSecondsLeft(b)) : fmt((new Date(b.expires_at) - now()) / 1000);
+    $('#hSub').textContent = { held: 'to check in', occupied: 'left in session', break: 'left on your break' }[b.status];
   }
   if (state.route === 'reserve') {
     let expired = false;
@@ -598,9 +607,8 @@ function tick() {
   const arc = $('#arc'), clock = $('#clock'), ring = $('#ring');
   if (b.status === 'occupied') {
     const dur = b.duration_s || 7200;
-    const left = Math.max(0, (new Date(b.checked_in_at).getTime() + dur * 1000 - now()) / 1000);
-    const hrs = Math.floor(left / 3600), m = Math.floor(left % 3600 / 60), sc = Math.floor(left % 60);
-    const txt = hrs > 0 ? `${hrs}:${String(m).padStart(2, '0')}:${String(sc).padStart(2, '0')}` : fmt(left);
+    const left = sessionSecondsLeft(b);
+    const txt = formatSessionTime(left);
     clock.textContent = txt;
     ring.classList.toggle('long', txt.length > 5);
     arc.style.strokeDashoffset = 628.3 * (1 - Math.max(0, Math.min(1, left / dur)));
