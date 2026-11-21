@@ -22,7 +22,7 @@ await boot.end();
 
 const app = createApp({ demo: DEMO, demoLogins: DEMO ? DEMO_LOGINS : null,
   databaseUrl: env.DATABASE_URL, sessionSecret: env.SESSION_SECRET, qrSecret: env.QR_SECRET,
-  publicOrigin: env.PUBLIC_ORIGIN || `http://localhost:${env.PORT || 8080}`,
+  publicOrigin: env.PUBLIC_ORIGIN || env.RENDER_EXTERNAL_URL || `http://localhost:${env.PORT || 8080}`,
   staticDir: fileURLToPath(new URL('../dist', import.meta.url)),
 });
 const port = await app.start(Number(env.PORT) || 8080);

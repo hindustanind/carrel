@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: carrel-larpers
+    runtime: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: carrel-larpers-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: QR_SECRET
+        generateValue: true
+      - key: SEED_DEMO
+        value: "1"
+
+databases:
+  - name: carrel-larpers-db
+    plan: free
+    region: oregon
+    databaseName: carrel
+    ipAllowList: []
