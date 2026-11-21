@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Carrel · Sign in</title>
+<meta name="description" content="Live seat availability for the LPU Central Library. Reserve a seat, then check in with the QR on the desk.">
+<meta name="theme-color" content="#120F0C">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" as="image" href="/assets/views/spotL.jpg">
+<link rel="stylesheet" href="/src/ui.css">
+<link rel="stylesheet" href="/src/login.css">
+</head>
+<body>
+<main class="login">
+  <img class="login-scene" src="/assets/views/spotL.jpg" alt="An empty chair in a beam of light in the LPU Central Library reading hall">
+  <div class="login-shade" aria-hidden="true"></div>
+
+  <header class="login-top on-scene">
+    <a class="brand" href="/" aria-label="Carrel"><span class="mark" aria-hidden="true"></span><span>Carrel</span></a>
+    <div class="role-switch" id="roleSwitch" role="group" aria-label="Sign in as">
+      <span class="rthumb" aria-hidden="true"></span>
+      <button type="button" id="roleStudent" data-role="student" aria-pressed="true">Student</button>
+      <button type="button" id="roleAdmin" data-role="admin" aria-pressed="false">Librarian</button>
+    </div>
+  </header>
+
+  <p class="login-live on-scene"><i class="dot"></i><span>LPU Central Library · <b class="num" id="freeNow">—</b> seats free right now</span></p>
+
+  <section class="login-form on-scene">
+    <div class="scan-note" id="scanNote" hidden>
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 20h1"/></svg>
+      <p>You scanned <b id="scanSeat"></b>. Sign in to check in.</p>
+    </div>
+
+    <div class="ltabs" id="ltabs" role="tablist" aria-label="Account">
+      <button role="tab" id="tabIn" aria-selected="true" aria-controls="form">Sign in</button>
+      <button role="tab" id="tabUp" aria-selected="false" aria-controls="form">New here</button>
+    </div>
+    <h1 class="grad login-title" id="headline">Welcome back</h1>
+    <p class="lede login-sub" id="sub">Use your LPU registration number.</p>
+
+    <form id="form" novalidate>
+      <label class="field up-only" hidden><span>Full name</span><input name="name" autocomplete="name" placeholder="As on your ID card"></label>
+      <label class="field"><span id="regLabel">Registration number</span><input name="reg_no" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" autocomplete="username" placeholder="8 digits" required></label>
+      <label class="field pw"><span>Password</span><input name="password" type="password" minlength="8" autocomplete="current-password" placeholder="At least 8 characters" required>
+        <button type="button" class="pw-eye" id="pwEye" aria-label="Show password">Show</button></label>
+      <p class="err" id="err" role="alert"></p>
+      <button class="btn btn-primary login-go" id="go" type="submit">Continue <span aria-hidden="true">→</span></button>
+    </form>
+
+    <div class="login-demo" id="demo" hidden>
+      <button type="button" class="demo-pill" id="demoQuick">Use demo student account</button>
+    </div>
+  </section>
+</main>
+<script type="module" src="/src/login.js"></script>
+</body>
+</html>

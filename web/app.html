@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Carrel</title>
+<meta name="theme-color" content="#120F0C">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" as="image" href="/assets/fly/f0001.jpg">
+<link rel="preload" as="image" href="/assets/views/hall.jpg">
+<link rel="stylesheet" href="/src/ui.css">
+<link rel="stylesheet" href="/src/app.css">
+</head>
+<body data-scene="home">
+<!-- the scene: the 3D library behind every view -->
+<div class="stage" aria-hidden="true">
+  <div class="cam" id="cam"><img id="camImg" src="/assets/fly/f0001.jpg" alt=""></div>
+  <canvas class="film" id="film"></canvas>
+  <div class="view" id="view"><img id="viewImg" alt=""></div>
+  <div class="shade" id="shade"></div>
+</div>
+
+<header id="bar" class="bar"></header>
+
+<!-- HOME: one slow scroll through the Blender flight; each part appears only while you scroll through it -->
+<main class="screen on-scene" id="home" data-view="home" hidden>
+  <section class="sec" data-sec="0" id="homeTop">
+    <p class="meta" id="greet">Welcome</p>
+    <h1 class="grad display">Reserve a seat</h1>
+    <p class="lede"><b class="num" id="homeFree">—</b> seats free right now across three floors.</p>
+    <a class="btn btn-primary btn-lg" href="/reserve" id="homeCta">Choose a seat</a>
+  </section>
+  <section class="sec" data-sec="1">
+    <p class="meta">Live, across the building</p>
+    <h2 class="grad title">Three floors</h2>
+    <div class="floor-nums" id="floorNums"></div>
+  </section>
+  <section class="sec" data-sec="2" id="secDesk">
+    <p class="meta" id="deskKick">How a seat becomes yours</p>
+    <h2 class="grad title" id="deskTitle">Hold it, then scan the desk</h2>
+    <p class="lede" id="deskText">Reserve a free seat and it is kept for you for 10 minutes. Scan the QR on that desk to check in.</p>
+    <div class="mini-pass" id="miniPass" hidden><b class="num" id="hClock">--:--</b><span id="hSub"></span></div>
+    <a class="btn btn-soft" href="/me" id="deskBtn" hidden>Open my seat</a>
+  </section>
+  <section class="sec" data-sec="3">
+    <p class="meta">Stepping away</p>
+    <h2 class="grad title">Breaks up to 20 minutes</h2>
+    <p class="lede">Start a break and the seat stays yours. Scan the desk when you are back. If a timer runs out, the seat goes back to everyone.</p>
+  </section>
+  <section class="sec" data-sec="4">
+    <p class="meta" id="endKick">Floor plan</p>
+    <h2 class="grad title" id="endTitle">Choose your seat</h2>
+    <p class="lede" id="endText">Keep scrolling to open the plan.</p>
+  </section>
+  <nav class="rail" id="rail" aria-label="Parts of the walk-in"></nav>
+  <p class="home-cue" id="homeCue"><span>Scroll to walk in</span><i aria-hidden="true"></i></p>
+</main>
+
+<!-- RESERVE: immersive locked full-screen 2D floor plan, then camera push-in to the seat you tap -->
+<main class="screen on-scene" id="reserve" data-view="reserve" hidden>
+  <section class="choose" id="choose">
+    <h1 class="sr">Choose a seat</h1>
+    <div class="choose-hud">
+      <div class="hud-left">
+        <div id="floorSeg" role="group" aria-label="Floor"></div>
+        <span class="hud-meta num" id="floorMeta">Loading…</span>
+      </div>
+      <div class="legend" aria-label="Legend"><span><i class="k free"></i>Free</span><span><i class="k held"></i>Held</span><span><i class="k break"></i>Break</span><span><i class="k taken"></i>Taken</span></div>
+    </div>
+    <div class="plan-frame">
+      <div class="plan" id="plan"></div>
+    </div>
+  </section>
+  <section class="landing" id="landing" hidden>
+    <p class="meta" id="lFloor"></p>
+    <h2 class="grad title" id="lTitle"></h2>
+    <p class="meta" id="lMeta"></p>
+    <span class="chip" id="lCap">Your view from this seat</span>
+    <div class="dur-picker" id="durPicker" aria-label="Booking duration">
+      <div class="dur-head"><span class="cap">Study session</span><b class="num" id="durReadout">2 hrs · until —</b></div>
+      <div class="dur-wheel" id="durWheel">
+        <div class="dur-center" aria-hidden="true"></div>
+        <div class="dur-track" id="durTrack" role="listbox" aria-label="Choose duration">
+          <button type="button" class="dur-opt" role="option" data-min="30" aria-selected="false"><span class="dur-val"><b>30</b><small>m</small></span><span class="dur-scale" aria-hidden="true"><i></i><i></i><i class="maj"></i><i></i><i></i></span></button>
+          <button type="button" class="dur-opt" role="option" data-min="60" aria-selected="false"><span class="dur-val"><b>1</b><small>hr</small></span><span class="dur-scale" aria-hidden="true"><i></i><i></i><i class="maj"></i><i></i><i></i></span></button>
+          <button type="button" class="dur-opt" role="option" data-min="120" aria-selected="true"><span class="dur-val"><b>2</b><small>hrs</small></span><span class="dur-scale" aria-hidden="true"><i></i><i></i><i class="maj"></i><i></i><i></i></span></button>
+          <button type="button" class="dur-opt" role="option" data-min="180" aria-selected="false"><span class="dur-val"><b>3</b><small>hrs</small></span><span class="dur-scale" aria-hidden="true"><i></i><i></i><i class="maj"></i><i></i><i></i></span></button>
+        </div>
+      </div>
+    </div>
+    <p class="err" id="lErr" role="alert"></p>
+    <button class="btn btn-primary btn-lg" id="reserveBtn">Reserve · 2 hrs</button>
+    <p class="cap l-hold-note">10 min hold to scan the QR on your desk</p>
+    <button class="btn btn-text" id="backBtn">← Back to the plan</button>
+  </section>
+</main>
+
+<!-- MY SEAT: the pass -->
+<main class="screen center on-scene" id="me" data-view="me" hidden>
+  <section class="pass" id="pass" hidden>
+    <span class="chip" id="pBadge"><i id="pDot"></i><span id="pState">Reserved for you</span></span>
+    <h1 class="grad title" id="pTitle"></h1>
+    <p class="meta" id="pMeta"></p>
+    <div class="ring" id="ring">
+      <svg viewBox="0 0 220 220" aria-hidden="true"><circle cx="110" cy="110" r="100" class="track"/><circle cx="110" cy="110" r="100" class="arc" id="arc"/></svg>
+      <div><b class="num" id="clock">--:--</b><span id="clockSub">to check in</span></div>
+    </div>
+    <button class="btn btn-primary btn-lg" id="primary">Scan the QR on your desk</button>
+    <div class="links" id="links"></div>
+    <p class="pass-foot" id="foot"></p>
+  </section>
+  <section class="empty" id="empty" hidden>
+    <p class="note" id="note" hidden></p>
+    <h1 class="grad title">No seat yet</h1>
+    <p class="lede">Pick a free seat, see it from the chair, and reserve it for 10 minutes.</p>
+    <a class="btn btn-primary btn-lg" href="/reserve" data-nav>Choose a seat</a>
+    <button class="btn btn-text" id="walkinScan" type="button" style="margin-top:8px">Already at a desk? Scan its QR</button>
+  </section>
+</main>
+
+<!-- PROFILE -->
+<main class="screen page profile" id="profile" data-view="profile" hidden>
+  <div class="prof-grid">
+    <section class="prof-card">
+      <div class="avatar xl" id="prAvatar">?</div>
+      <h1 class="h1" id="prName"></h1>
+      <p class="meta num" id="prReg"></p>
+      <div class="prof-stats"><div><b class="num" id="stHours">0h</b><span>studied</span></div><div><b class="num" id="stChecks">0</b><span>check‑ins</span></div><div><b class="num" id="stNo">0</b><span>no‑shows</span></div></div>
+      <button class="btn btn-soft" id="prOut">Sign out</button>
+    </section>
+    <section>
+      <h2 class="h2">This week</h2>
+      <p class="meta" id="weekSum"></p>
+      <div class="week" id="week"></div>
+      <h2 class="h2" style="margin-top:40px">Recent sessions</h2>
+      <div class="sessions" id="sessions"></div>
+    </section>
+  </div>
+</main>
+
+<div class="peek-bar" id="peekBar" hidden>
+  <button type="button" class="btn btn-soft" id="peekClose">← Back to my seat</button>
+</div>
+
+<nav id="tabbar"></nav>
+
+<dialog id="scanner" class="as-sheet" aria-labelledby="scTitle">
+  <div class="dlg">
+    <div class="dlg-head"><h2 class="h2" id="scTitle">Scan the QR on your desk</h2><button class="btn btn-text" id="scanClose">Close</button></div>
+    <div class="cam-box" id="camBox"><video id="camVideo" autoplay playsinline webkit-playsinline muted></video><div class="frame" aria-hidden="true"></div></div>
+    <p class="err" id="scanErr" role="alert" style="margin-top:10px"></p>
+    <input type="file" id="qrPhoto" accept="image/*" capture="environment" hidden>
+    <button class="btn btn-soft btn-block" type="button" id="qrPhotoBtn" style="margin-top:10px">Take a photo of the QR</button>
+    <p class="cap" style="margin:10px 0 0;text-align:center">Or scan directly with your phone's Camera app.</p>
+    <p class="meta" style="margin:16px 0 4px">Or paste the desk link:</p>
+    <form id="codeForm" class="code-row">
+      <label class="field" style="flex:1"><span class="sr">Desk code link</span><input id="codeInput" placeholder="https://…/s/F2-T07-S3?k=…" autocomplete="off"></label>
+      <button class="btn btn-primary" id="codeGo">Check in</button>
+    </form>
+  </div>
+</dialog>
+
+<script type="module" src="/src/app.js"></script>
+</body>
+</html>

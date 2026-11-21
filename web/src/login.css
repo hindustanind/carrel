@@ -1,0 +1,57 @@
+.login { position: relative; min-height: 100svh; overflow: hidden; }
+.login-scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(.95) brightness(1.04); animation: settle 2.4s var(--ease) both; }
+@keyframes settle { from { transform: scale(1.06); opacity: 0; } }
+.login-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(18,15,12,0) 40%, rgba(18,15,12,.58) 58%, rgba(18,15,12,.92) 74%), linear-gradient(180deg, rgba(18,15,12,.62), rgba(18,15,12,0) 20%), linear-gradient(0deg, rgba(18,15,12,.6), rgba(18,15,12,0) 22%); }
+
+/* top bar: brand on left, refined Student / Librarian role switcher on top right */
+.login-top { position: absolute; z-index: 4; top: 32px; left: var(--gut); right: var(--gut); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.role-switch { position: relative; display: inline-flex; padding: 4px; border-radius: 999px; background: rgba(24, 19, 15, .64); border: 1px solid rgba(255, 236, 214, .14); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: inset 0 1px 0 rgba(255, 248, 238, .08), 0 10px 30px rgba(0, 0, 0, .35); }
+.role-switch .rthumb { position: absolute; z-index: 0; top: 4px; left: 4px; height: calc(100% - 8px); border-radius: 999px; background: var(--ivory); box-shadow: inset 0 1px 0 #fff, 0 4px 14px rgba(10, 8, 6, .35); transition: transform .34s var(--ease), width .34s var(--ease); }
+.role-switch button { position: relative; z-index: 1; height: 34px; padding: 0 18px; border-radius: 999px; font-size: 13.5px; font-weight: 600; letter-spacing: -.005em; color: var(--muted); transition: color .24s var(--ease); }
+.role-switch button:hover { color: var(--ink); }
+.role-switch button[aria-pressed="true"] { color: var(--ivory-ink); }
+
+.login-live { position: absolute; left: var(--gut); bottom: 44px; z-index: 2; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); }
+.login-live b { color: var(--ink); font-weight: 500; }
+.login-live .dot { box-shadow: 0 0 0 4px rgba(255,236,214,.14); animation: breathe 2.4s ease-in-out infinite; }
+@keyframes breathe { 50% { box-shadow: 0 0 0 7px rgba(255,236,214,.06); } }
+
+.login-form { position: absolute; z-index: 2; right: clamp(24px, 7vw, 120px); top: 50%; transform: translateY(-50%); width: min(400px, calc(100vw - 48px)); animation: rise .7s var(--ease) .15s both; }
+@keyframes rise { from { opacity: 0; transform: translateY(calc(-50% + 14px)); } }
+.ltabs { display: flex; border-bottom: 1px solid var(--line); }
+.ltabs button { flex: 1; height: 42px; text-align: left; font-size: 15px; font-weight: 500; color: var(--muted); position: relative; }
+.ltabs button + button { text-align: right; }
+.ltabs button[aria-selected="true"] { color: var(--ink); }
+.ltabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: #EAE1D6; border-radius: 2px; }
+.ltabs button + button[aria-selected="true"]::after { left: auto; width: 50%; }
+.ltabs button:first-child[aria-selected="true"]::after { right: auto; width: 50%; }
+.login-title { font-size: 48px; line-height: 1.02; font-weight: 600; letter-spacing: -.04em; margin-top: 28px; }
+.login-sub { font-size: 16px; margin-top: 8px; }
+#form { margin-top: 18px; }
+.pw { position: relative; }
+.pw input { padding-right: 60px; }
+.pw-eye { position: absolute; right: 0; bottom: 12px; height: 30px; font-size: 14px; color: var(--muted); }
+.pw-eye:hover { color: var(--ink); }
+.err:empty { min-height: 12px; }
+.login-go { margin-top: 18px; width: 100%; }
+
+.login-demo { margin-top: 16px; display: flex; justify-content: center; }
+.demo-pill { height: 36px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--muted); background: rgba(255, 236, 214, .06); border: 1px solid rgba(255, 236, 214, .12); transition: color .2s, background-color .2s, border-color .2s; }
+.demo-pill:hover { color: var(--ink); background: rgba(255, 236, 214, .11); border-color: rgba(255, 236, 214, .22); }
+
+.scan-note { display: flex; gap: 14px; align-items: center; padding: 14px 16px; margin-bottom: 20px; border-radius: 16px; background: var(--overlay); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid rgba(255, 236, 214, .1); }
+.scan-note svg { flex: none; color: #EAE1D6; }
+.scan-note p { font-size: 14.5px; }
+
+@media (max-width: 900px) {
+  .login-scene { height: 42svh; object-position: 30% 50%; }
+  .login-shade { background: linear-gradient(180deg, rgba(18,15,12,.58), rgba(18,15,12,0) 18%, rgba(18,15,12,0) 24%, rgba(18,15,12,1) 42%); }
+  .login-top { top: 16px; }
+  .role-switch button { height: 32px; padding: 0 14px; font-size: 13px; }
+  .login-form { position: relative; right: auto; top: auto; transform: none; margin: 28svh auto 0; padding-bottom: 56px; animation-name: riseM; }
+  @keyframes riseM { from { opacity: 0; transform: translateY(14px); } }
+  .login-title { font-size: 34px; margin-top: 16px; }
+  .login-sub { font-size: 15px; margin-top: 6px; }
+  #form { margin-top: 12px; }
+  .login-live { left: 0; right: 0; bottom: 16px; justify-content: center; font-size: 13px; }
+}

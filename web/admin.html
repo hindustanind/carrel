@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Carrel · Dashboard</title>
+<meta name="theme-color" content="#120F0C">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/src/ui.css">
+<link rel="stylesheet" href="/src/admin.css">
+</head>
+<body>
+<div class="stage" aria-hidden="true"><img src="/assets/views/spotH.jpg" alt=""><div class="shade"></div></div>
+<header id="bar" class="bar"></header>
+
+<!-- DASHBOARD -->
+<main class="page on-scene" id="tab-dash" aria-labelledby="dashTitle">
+  <div class="page-head">
+    <div><p class="meta" id="asof">Loading…</p><h1 class="grad title" id="dashTitle">Library today</h1></div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="cols">
+    <section>
+      <h2 class="h2">Peak hours</h2>
+      <p class="meta">Seat use by weekday and hour, last 28 days (IST). Lighter means busier.</p>
+      <div class="heat" id="heat" role="img" aria-label="Heatmap of seat use by weekday and hour"></div>
+      <p class="peak" id="peak"></p>
+    </section>
+    <section>
+      <h2 class="h2">Seats held but not used</h2>
+      <p class="meta">Last 7 days. A pattern to look into, not an accusation.</p>
+      <table class="tbl"><thead><tr><th>Student</th><th>What happened</th><th class="r">Score</th></tr></thead><tbody id="hogs"></tbody></table>
+      <p class="cap foot">Score = 2 × holds never checked in + 2 × breaks that ran out + long breaks + hours on break.</p>
+    </section>
+  </div>
+</main>
+
+<!-- SEATS -->
+<main class="page on-scene" id="tab-seats" hidden aria-labelledby="seatsTitle">
+  <div class="page-head">
+    <div><p class="meta">Every held, checked-in and on-break seat, live.</p><h1 class="grad title" id="seatsTitle">Seats in use</h1></div>
+    <div id="floorSeg" role="group" aria-label="Floor"></div>
+  </div>
+  <table class="tbl"><thead><tr><th>Seat</th><th>Status</th><th>Timer ends</th><th class="r"><span class="sr">Action</span></th></tr></thead><tbody id="active"></tbody></table>
+  <div class="cols tools">
+    <section class="card" id="speed">
+      <h2 class="h2">Demo speed</h2>
+      <p class="meta">Shortens the 10-minute hold and 20-minute break for live demos. Applies to new holds and breaks.</p>
+      <div id="scale" role="group" aria-label="Time scale"><button data-s="1">Real time</button><button data-s="20">20× faster</button><button data-s="60">60× faster</button></div>
+    </section>
+    <section>
+      <h2 class="h2">Print desk QR codes</h2>
+      <p class="meta">One signed code per desk. Codes can't be edited or moved to another seat.</p>
+      <div class="row-btns"><a class="btn btn-soft" href="/api/admin/qr?floor=1" target="_blank">Floor 1</a><a class="btn btn-soft" href="/api/admin/qr?floor=2" target="_blank">Floor 2</a><a class="btn btn-soft" href="/api/admin/qr?floor=3" target="_blank">Floor 3</a></div>
+    </section>
+  </div>
+</main>
+
+<!-- DESK QR: centred, full screen, like the seat pass -->
+<main class="desk on-scene" id="tab-desk" hidden aria-labelledby="pTitle">
+  <div id="deskFloors" role="group" aria-label="Floor"></div>
+  <p class="meta" id="pWhere">—</p>
+  <h1 class="grad title" id="pTitle">—</h1>
+  <p class="desk-state" id="state"><i></i><b id="sWord">—</b><span id="sSub"></span></p>
+  <div class="qr" id="qr" role="img" aria-label="Desk QR code"></div>
+  <p class="meta">Point your phone camera at the code</p>
+  <p class="cap" id="qrHost"></p>
+  <div class="picker">
+    <button class="btn btn-soft" id="prev" aria-label="Previous seat">←</button>
+    <label class="sr" for="seatSel">Seat</label><select id="seatSel"></select>
+    <button class="btn btn-soft" id="next" aria-label="Next seat">→</button>
+  </div>
+  <div class="desk-links"><button id="freeBtn">Next free seat</button><button id="copyLink">Copy link</button><button id="reset">Free this seat again</button></div>
+  <div class="log" id="log" aria-live="polite"></div>
+  <div class="mini" id="plan" aria-hidden="true" hidden></div>
+</main>
+<nav id="tabbar"></nav>
+<script type="module" src="/src/admin.js"></script>
+</body>
+</html>
